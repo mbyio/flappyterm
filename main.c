@@ -45,6 +45,7 @@ static void make_pipe(char* const col, int length, int top_length);
 static void check_window_size();
 
 static WINDOW* screen;
+static int score = 0;
 
 int main() {
     int return_val = 0;
@@ -66,7 +67,8 @@ int main() {
             return_val = -2;
             goto main_end;
         }
-        if (gameData.world[0][(int)gameData.playerY] == PIPE_CHAR) {
+        if (gameData.world[0][(int)gameData.playerY] == PIPE_CHAR ||
+                gameData.playerY > HEIGHT || gameData.playerY < 0) {
             break;
         }
     }
@@ -81,6 +83,7 @@ main_end:
 static void update() {
     static int pipe_count = PIPE_SPACE + INITIAL_SPACE;
     static int top_length = 0;
+    score++;
     for (int i = 1; i < WIDTH; i++) {
         memcpy(gameData.world[i - 1], gameData.world[i], HEIGHT * sizeof(char));
     }
@@ -118,6 +121,8 @@ static void draw() {
     }
     move(((int)gameData.playerY) + 1, 1);
     addch(PLAYER_CHAR);
+    move(HEIGHT, WIDTH - 12);
+    printw("Score: %d", score);
     refresh();
 }
 
@@ -147,7 +152,7 @@ static void draw_border() {
 static void draw_end() {
     erase();
     move(0,0);
-    printw("Game Over! (Press any key to quit)");
+    printw("Game Over! Final Score: %d (Press any key to quit)", score);
 }
 
 static int sync_loop() {
