@@ -20,16 +20,18 @@
 #define PIPE_CHAR 'H'
 #define PIPE_SPACE 20
 
-struct {
+static struct {
     char world[WIDTH][HEIGHT];
+    int playerY;
+    int playerYVelocity;
 } gameData;
 
-int init();
-void draw();
-void draw_border();
-void update();
-int sync_loop();
-void make_pipe(char* const col, int length);
+static int init();
+static void draw();
+static void draw_border();
+static void update();
+static int sync_loop();
+static void make_pipe(char* const col, int length);
 
 int main() {
     int return_val = 0;
@@ -49,7 +51,7 @@ main_end:
     return return_val;
 }
 
-void update() {
+static void update() {
     char old[HEIGHT];
     memcpy(old, gameData.world[0], HEIGHT * sizeof(char));
     for (int i = 1; i < WIDTH; i++) {
@@ -58,7 +60,7 @@ void update() {
     memcpy(gameData.world[WIDTH - 1], old, HEIGHT * sizeof(char));
 }
 
-void draw() {
+static void draw() {
     draw_border();
     for (int i = 0; i < HEIGHT; i++) {
         move(i + 1, 1);
@@ -69,7 +71,7 @@ void draw() {
     refresh();
 }
 
-void draw_border() {
+static void draw_border() {
     for (int i = 1; i <= WIDTH; i++) {
         move(0, i);
         addch('-');
@@ -92,7 +94,7 @@ void draw_border() {
     addch('+');
 }
 
-int sync_loop() {
+static int sync_loop() {
     long pause = 1000000000 / FPS;
     struct timespec time = {0, pause};
     struct timespec rem = {0, 0};
@@ -111,7 +113,7 @@ int sync_loop() {
     return 0;
 }
 
-int init() {
+static int init() {
     WINDOW* screen;
     if ((screen = initscr()) == NULL) {
         fprintf(stderr, "initscr failed");
@@ -148,7 +150,7 @@ init_err:
     return -1;
 }
 
-void make_pipe(char* const col, int length) {
+static void make_pipe(char* const col, int length) {
     int max_top_extra_len = length - MIN_PIPE_TOP - MIN_PIPE_BOTTOM -
         PIPE_GAP;
     int top_extra_len = rand() % max_top_extra_len;
