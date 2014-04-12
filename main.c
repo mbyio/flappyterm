@@ -7,8 +7,8 @@
 
 #include <ncurses.h>
 
-#define WIDTH 120
-#define HEIGHT 40
+#define WIDTH 160
+#define HEIGHT 50
 #define FPS 25
 
 // The bottom of a pipe must take up this many chars
@@ -16,20 +16,25 @@
 // The top of a pipe must take up this many chars
 #define MIN_PIPE_TOP 5
 // There must be this many chars of space for the player to move through
-#define PIPE_GAP 5
+#define PIPE_GAP 15
 #define PIPE_CHAR 'H'
-#define PIPE_SPACE 20
+#define PIPE_SPACE 25
+#define PLAYER_CHAR 'P'
+#define GRAVITY_ACCEL 0.15
+#define PLAYER_START_VELOCITY 0
+#define PLAYER_JUMP_VELOCITY -1.5
 
 static struct {
     char world[WIDTH][HEIGHT];
-    int playerY;
-    int playerYVelocity;
+    float playerY;
+    float playerYVelocity;
 } gameData;
 
 static int init();
 static void draw();
 static void draw_border();
 static void update();
+static void player_jump();
 static int sync_loop();
 static void make_pipe(char* const col, int length);
 
@@ -39,13 +44,20 @@ int main() {
         return_val = -1;
         goto main_end;
     }
-    do {
+    while (true) {
+        char in = getch();
+        if (in == 'q') {
+            break;
+        } else if (in == ' '){
+            player_jump();
+        }
+
         update();
         draw();
         if (sync_loop() == -1) {
             return -2;
         }
-    } while (getch() != 'q');
+    }
 main_end:
     endwin();
     return return_val;
@@ -58,6 +70,12 @@ static void update() {
         memcpy(gameData.world[i - 1], gameData.world[i], HEIGHT * sizeof(char));
     }
     memcpy(gameData.world[WIDTH - 1], old, HEIGHT * sizeof(char));
+    gameData.playerY += gameData.playerYVelocity;
+    gameData.playerYVelocity += GRAVITY_ACCEL;
+}
+
+static void player_jump() {
+    gameData.playerYVelocity = PLAYER_JUMP_VELOCITY;
 }
 
 static void draw() {
@@ -68,6 +86,8 @@ static void draw() {
             addch(gameData.world[j][i]);
         }
     }
+    move(((int)gameData.playerY) + 1, 1);
+    addch(PLAYER_CHAR);
     refresh();
 }
 
@@ -145,6 +165,8 @@ static int init() {
             memset(gameData.world[i], ' ', HEIGHT * sizeof(char));
         }
     }
+    gameData.playerY = HEIGHT / 2;
+    gameData.playerYVelocity = PLAYER_START_VELOCITY;
     return 0;
 init_err:
     return -1;
