@@ -16,13 +16,15 @@
 // The top of a pipe must take up this many chars
 #define MIN_PIPE_TOP 5
 // There must be this many chars of space for the player to move through
-#define PIPE_GAP 15
+#define PIPE_GAP 10
 #define PIPE_CHAR 'H'
 #define PIPE_SPACE 25
+#define INITIAL_SPACE 50
 #define PLAYER_CHAR 'P'
 #define GRAVITY_ACCEL 0.15
 #define PLAYER_START_VELOCITY 0
 #define PLAYER_JUMP_VELOCITY -1.5
+#define PIPE_WIDTH 5
 
 static struct {
     char world[WIDTH][HEIGHT];
@@ -36,7 +38,8 @@ static void draw_border();
 static void update();
 static void player_jump();
 static int sync_loop();
-static void make_pipe(char* const col, int length);
+static int get_top_length(int height);
+static void make_pipe(char* const col, int length, int top_length);
 
 int main() {
     int return_val = 0;
@@ -64,12 +67,26 @@ main_end:
 }
 
 static void update() {
-    char old[HEIGHT];
-    memcpy(old, gameData.world[0], HEIGHT * sizeof(char));
+    static int pipe_count = PIPE_SPACE + INITIAL_SPACE;
+    static int top_length = 0;
     for (int i = 1; i < WIDTH; i++) {
         memcpy(gameData.world[i - 1], gameData.world[i], HEIGHT * sizeof(char));
     }
-    memcpy(gameData.world[WIDTH - 1], old, HEIGHT * sizeof(char));
+    pipe_count--;
+    if (pipe_count <= 0) {
+        if (top_length == 0) {
+            top_length = get_top_length(HEIGHT);
+        }
+        make_pipe(gameData.world[WIDTH - 1], HEIGHT, top_length);
+        // use pipe_count as both the counter between pipe starts and the
+        // counter for the width of each pipe
+        if (pipe_count <= 1 - PIPE_WIDTH) {
+            pipe_count = PIPE_SPACE;
+            top_length = 0;
+        }
+    } else {
+        memset(gameData.world[WIDTH - 1], ' ', HEIGHT * sizeof(char));
+    }
     gameData.playerY += gameData.playerYVelocity;
     gameData.playerYVelocity += GRAVITY_ACCEL;
 }
@@ -155,15 +172,8 @@ static int init() {
         fprintf(stderr, "disabling the cursor failed");
         goto init_err;
     }
-    int pipe_count = PIPE_SPACE;
     for (int i = 0; i < WIDTH; i++) {
-        pipe_count--;
-        if (pipe_count <= 0) {
-            pipe_count = PIPE_SPACE;
-            make_pipe(gameData.world[i], HEIGHT);
-        } else {
-            memset(gameData.world[i], ' ', HEIGHT * sizeof(char));
-        }
+        memset(gameData.world[i], ' ', HEIGHT * sizeof(char));
     }
     gameData.playerY = HEIGHT / 2;
     gameData.playerYVelocity = PLAYER_START_VELOCITY;
@@ -172,14 +182,16 @@ init_err:
     return -1;
 }
 
-static void make_pipe(char* const col, int length) {
-    int max_top_extra_len = length - MIN_PIPE_TOP - MIN_PIPE_BOTTOM -
+static int get_top_length(int height) {
+    int max_top_extra_len = height - MIN_PIPE_TOP - MIN_PIPE_BOTTOM -
         PIPE_GAP;
-    int top_extra_len = rand() % max_top_extra_len;
+    return rand() % max_top_extra_len;
+}
 
-    int top_count = MIN_PIPE_TOP + top_extra_len;
+static void make_pipe(char* const col, int height, int top_length) {
+    int top_count = MIN_PIPE_TOP + top_length;
     int space_count = PIPE_GAP;
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < height; i++) {
         if (top_count > 0) {
             top_count--;
             col[i] = PIPE_CHAR;
