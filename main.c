@@ -59,7 +59,8 @@ int main() {
         update();
         draw();
         if (sync_loop() == -1) {
-            return -2;
+            return_val = -2;
+            goto main_end;
         }
         if (gameData.world[0][(int)gameData.playerY] == PIPE_CHAR) {
             break;
