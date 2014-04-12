@@ -42,6 +42,8 @@ static int sync_loop();
 static int get_top_length(int height);
 static void make_pipe(char* const col, int length, int top_length);
 
+static WINDOW* screen;
+
 int main() {
     int return_val = 0;
     if (init() == -1) {
@@ -67,7 +69,7 @@ int main() {
         }
     }
     draw_end();
-    timeout(-1);
+    nodelay(screen, false);
     getch();
 main_end:
     endwin();
@@ -165,7 +167,6 @@ static int sync_loop() {
 }
 
 static int init() {
-    WINDOW* screen;
     if ((screen = initscr()) == NULL) {
         fprintf(stderr, "initscr failed");
         goto init_err;
