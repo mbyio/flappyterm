@@ -32,8 +32,10 @@ int sync_loop();
 void make_pipe(char* const col, int length);
 
 int main() {
+    int return_val = 0;
     if (init() == -1) {
-        return -1;
+        return_val = -1;
+        goto main_end;
     }
     do {
         update();
@@ -42,7 +44,9 @@ int main() {
             return -2;
         }
     } while (getch() != 'q');
-    return 0;
+main_end:
+    endwin();
+    return return_val;
 }
 
 void update() {
