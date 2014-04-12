@@ -125,6 +125,10 @@ int init() {
         fprintf(stderr, "setting noecho mode failed");
         goto init_err;
     }
+    if (curs_set(0) == ERR) {
+        fprintf(stderr, "disabling the cursor failed");
+        goto init_err;
+    }
     int pipe_count = PIPE_SPACE;
     for (int i = 0; i < WIDTH; i++) {
         pipe_count--;
