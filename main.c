@@ -8,8 +8,8 @@
 
 #include <ncurses.h>
 
-#define WIDTH 160
-#define HEIGHT 50
+#define WIDTH 100
+#define HEIGHT 40
 #define FPS 25
 
 // The bottom of a pipe must take up this many chars
