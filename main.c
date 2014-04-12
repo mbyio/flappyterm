@@ -26,6 +26,7 @@ struct {
 
 int init();
 void draw();
+void draw_border();
 void update();
 int sync_loop();
 void make_pipe(char* const col, int length);
@@ -54,13 +55,37 @@ void update() {
 }
 
 void draw() {
+    draw_border();
     for (int i = 0; i < HEIGHT; i++) {
-        move(i,0);
+        move(i + 1, 1);
         for (int j = 0; j < WIDTH; j++) {
             addch(gameData.world[j][i]);
         }
     }
     refresh();
+}
+
+void draw_border() {
+    for (int i = 1; i <= WIDTH; i++) {
+        move(0, i);
+        addch('-');
+        move(HEIGHT + 1, i);
+        addch('-');
+    }
+    for (int i = 1; i <= HEIGHT; i++) {
+        move(i, 0);
+        addch('|');
+        move(i, WIDTH + 1);
+        addch('|');
+    }
+    move(0,0);
+    addch('+');
+    move(0, WIDTH + 1);
+    addch('+');
+    move(HEIGHT + 1,0);
+    addch('+');
+    move(HEIGHT + 1, WIDTH + 1);
+    addch('+');
 }
 
 int sync_loop() {
