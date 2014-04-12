@@ -1,5 +1,5 @@
 CC=clang
-CFLAGS=-c -Wall -Wextra -std=c11 -Wfloat-equal -Wundef -Wpointer-arith \
+CFLAGS=-c -g -Wall -Wextra -std=gnu11 -Wfloat-equal -Wundef -Wpointer-arith \
 	-Wstrict-prototypes -Wwrite-strings -Waggregate-return \
 	-Wunreachable-code -Werror -Wfatal-errors
 LDLIBS=-lncurses
@@ -14,4 +14,4 @@ $(EXECUTABLE): $(OBJECTS)
 
 .PHONY: clean
 clean:
-	rm -f main.o 
+	rm -f main.o flappyterm
