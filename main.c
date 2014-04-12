@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include <ncurses.h>
 
@@ -41,6 +42,7 @@ static void player_jump();
 static int sync_loop();
 static int get_top_length(int height);
 static void make_pipe(char* const col, int length, int top_length);
+static void check_window_size();
 
 static WINDOW* screen;
 
@@ -106,6 +108,7 @@ static void player_jump() {
 }
 
 static void draw() {
+    check_window_size();
     draw_border();
     for (int i = 0; i < HEIGHT; i++) {
         move(i + 1, 1);
@@ -215,6 +218,23 @@ static void make_pipe(char* const col, int height, int top_length) {
             col[i] = ' ';
         } else {
             col[i] = PIPE_CHAR;
+        }
+    }
+}
+
+static void check_window_size() {
+    while (true) {
+        int width = getmaxx(screen);
+        int height = getmaxy(screen);
+        if (width < WIDTH + 2 || height < HEIGHT + 2) {
+            erase();
+            move(0, 0);
+            // HEIGHT + 4 because ncurses needs 2 extra chars on the bottom
+            printw("Increase terminal width to %d by %d to continue", WIDTH + 2, HEIGHT + 4);
+            refresh();
+            sleep(1);
+        } else {
+            break;
         }
     }
 }
