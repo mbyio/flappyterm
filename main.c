@@ -35,6 +35,7 @@ static struct {
 static int init();
 static void draw();
 static void draw_border();
+static void draw_end();
 static void update();
 static void player_jump();
 static int sync_loop();
@@ -60,7 +61,13 @@ int main() {
         if (sync_loop() == -1) {
             return -2;
         }
+        if (gameData.world[0][(int)gameData.playerY] == PIPE_CHAR) {
+            break;
+        }
     }
+    draw_end();
+    timeout(-1);
+    getch();
 main_end:
     endwin();
     return return_val;
@@ -129,6 +136,12 @@ static void draw_border() {
     addch('+');
     move(HEIGHT + 1, WIDTH + 1);
     addch('+');
+}
+
+static void draw_end() {
+    erase();
+    move(0,0);
+    printw("Game Over! (Press any key to quit)");
 }
 
 static int sync_loop() {
