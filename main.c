@@ -54,14 +54,14 @@ int main() {
         goto main_end;
     }
 
-	char in;
+    char in;
 
-	draw();
-	in  = getch();
-	while (in != ' ') {
-		in = getch();
-	}
-	player_jump();
+    draw();
+    in  = getch();
+    while (in != ' ') {
+        in = getch();
+    }
+    player_jump();
 
     while (true) {
         in = getch();
