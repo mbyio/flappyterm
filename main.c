@@ -53,8 +53,18 @@ int main() {
         return_val = -1;
         goto main_end;
     }
+
+	char in;
+
+	draw();
+	in  = getch();
+	while (in != ' ') {
+		in = getch();
+	}
+	player_jump();
+
     while (true) {
-        char in = getch();
+        in = getch();
         if (in == 'q') {
             break;
         } else if (in == ' '){
