@@ -51,7 +51,7 @@ class PipeManager():
 
 class Player():
 
-    def __init__(self, window, on_dead): 
+    def __init__(self, window, on_dead):
         self.win_height, self.win_width = window.getmaxyx()
         self.y = self.win_height / 2
         self.x = self.win_width / 4
