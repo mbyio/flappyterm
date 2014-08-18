@@ -43,7 +43,7 @@ class Game(object):
         while not self.exiting:
             states.current_state.update()
             states.current_state.draw()
-            sleep(1 / 60)
+            sleep(1 / TARGET_FPS)
 
     def exit(self):
         self.exiting = True

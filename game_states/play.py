@@ -1,7 +1,48 @@
+import random
+
 from states import GameState
 from config import *
 
-class Player(object):
+
+class PipeManager():
+
+    MAX_HEIGHT = PLAY_HEIGHT - PIPE_MARGIN * 2 - PIPE_GAP_SIZE
+
+    def __init__(self):
+        self.pipe_counter = INITIAL_PIPE_SPACE
+        self.pipes = []
+
+    def update(self):
+        for pipe in self.pipes:
+            pipe['x'] -= 1
+        self.pipe_counter -= 1
+        if self.pipe_counter == 0:
+            self.pipe_counter = SPACE_BETWEEN_PIPES + PIPE_WIDTH
+            self.add_pipe()
+
+    def add_pipe(self):
+        self.pipes.append({
+            'height': random.randint(0, self.MAX_HEIGHT - 1),
+            'x': PLAY_WIDTH
+            })
+
+    def draw(self, window):
+        for pipe in self.pipes:
+            x = pipe['x']
+            for x in range(x, x + PIPE_WIDTH):
+                if x >= PLAY_WIDTH or x < 0:
+                    continue
+                self.draw_pipe_col(x, pipe['height'], window)
+
+    def draw_pipe_col(self, x, pipe_height, window):
+        for y in range(0, PIPE_MARGIN + pipe_height):
+            window.addstr(y, x, PIPE_SYMBOL)
+        y += PIPE_GAP_SIZE
+        for y in range(y, PLAY_HEIGHT - 1):
+            window.addstr(y, x, PIPE_SYMBOL)
+
+
+class Player():
 
     def __init__(self, window, on_dead): 
         self.win_height, self.win_width = window.getmaxyx()
@@ -50,6 +91,7 @@ class PlayState(GameState):
         window.border()
         window.refresh()
         self.player = Player(self.play_win, self.on_dead)
+        self.pipes = PipeManager()
 
     def on_dead(self):
         self.game.states.change_state('end')
@@ -66,8 +108,11 @@ class PlayState(GameState):
             self.player.jump()
         self.player.update()
 
+        self.pipes.update()
+
     def draw(self):
         self.play_win.clear()
         self.player.draw(self.play_win)
+        self.pipes.draw(self.play_win)
         self.play_win.refresh()
         self.game.window.refresh()
