@@ -110,6 +110,7 @@ class PlayState(GameState):
         window.refresh()
         self.player = Player(self.play_win, self.on_dead)
         self.pipes = PipeManager()
+        self.score = 0
 
     def on_dead(self):
         self.game.states.change_state('end')
@@ -125,14 +126,15 @@ class PlayState(GameState):
         elif key == ' ':
             self.player.jump()
         self.player.update()
-
         self.pipes.update()
         if self.pipes.collide(self.player):
             self.on_dead()
+        self.score += 1
 
     def draw(self):
         self.play_win.clear()
         self.player.draw(self.play_win)
         self.pipes.draw(self.play_win)
+        self.play_win.addstr(2, 2, 'Score: %d' % self.score)
         self.play_win.refresh()
         self.game.window.refresh()
