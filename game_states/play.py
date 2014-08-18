@@ -12,6 +12,17 @@ class PipeManager():
         self.pipe_counter = INITIAL_PIPE_SPACE
         self.pipes = []
 
+    def collide(self, player):
+        for pipe in self.pipes:
+            pipe_left = pipe['x']
+            pipe_right = pipe_left + PIPE_WIDTH
+            if int(player.x) in range(pipe_left, pipe_right):
+                pipe_gap_top = pipe['height'] + PIPE_MARGIN
+                pipe_gap_bottom = pipe_gap_top + PIPE_GAP_SIZE
+                if int(player.y) not in range(pipe_gap_top, pipe_gap_bottom):
+                    return True
+        return False
+
     def update(self):
         for pipe in self.pipes:
             pipe['x'] -= 1
@@ -116,6 +127,8 @@ class PlayState(GameState):
         self.player.update()
 
         self.pipes.update()
+        if self.pipes.collide(self.player):
+            self.on_dead()
 
     def draw(self):
         self.play_win.clear()
