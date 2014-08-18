@@ -68,7 +68,7 @@ class Player():
         self.x = self.win_width / 4
         self.velocityX = 0
         self.velocityY = PLAYER_JUMP_VELOCITY_Y
-        self.accelY = 0.05
+        self.accelY = GRAVITY_ACCEL
         self.on_dead = on_dead
 
     def jump(self):
