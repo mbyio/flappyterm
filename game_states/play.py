@@ -15,6 +15,13 @@ class PipeManager():
     def update(self):
         for pipe in self.pipes:
             pipe['x'] -= 1
+        try:
+            first = self.pipes[0]
+            if first['x'] + PIPE_WIDTH < 0:
+                self.pipes.pop(0)
+        except IndexError:
+            pass
+
         self.pipe_counter -= 1
         if self.pipe_counter == 0:
             self.pipe_counter = SPACE_BETWEEN_PIPES + PIPE_WIDTH
